@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { FullChatView } from './FullChatView';
 import { ChatPopUpWidget } from './ChatPopUpWidget';
+import { EmailDetailView } from './EmailDetailView';
 
 interface EmailThread {
   id: string;
@@ -39,6 +40,7 @@ interface EmailThread {
 }
 
 const EMAIL_LIST: EmailThread[] = [
+  { id: '0', sender: 'Navatej Kumar', badge: 'NEEDS REPLY', subject: 'Updated needed on Gmail feedback', time: '11:38 AM', unread: true },
   { id: '1', sender: 'shiwani', badge: 'NEEDS REPLY', subject: 'Meet the Plansom team at T-Hub | 17–18 Aug', time: '1:27 PM', unread: true },
   { id: '2', sender: 'me, Sahana 9', badge: 'ACTION REQ', subject: 'Nova – UX Design Trainee (Graduation Project Review)', time: '11:27 AM', unread: true },
   { id: '3', sender: 'Geetika M (via Goog.)', badge: 'FYI', subject: 'Spreadsheet shared with you: "Merai tesing" – Q3 Budgeting', time: '10:38 AM', unread: false },
@@ -71,7 +73,8 @@ const GmailLogo = () => (
 );
 
 export const GmailBackground: React.FC = () => {
-  const [activeApp, setActiveApp] = useState<'Mail' | 'Chat' | 'Meet'>('Chat');
+  const [activeApp, setActiveApp] = useState<'Mail' | 'Chat' | 'Meet'>('Mail');
+  const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
 
   return (
     <div className="h-screen w-screen bg-[#F6F8FC] flex flex-col font-sans select-none overflow-hidden text-[#1F1F1F]">
@@ -246,83 +249,96 @@ export const GmailBackground: React.FC = () => {
 
         {/* EMAIL CONTAINER */}
         <main className="flex-1 bg-white rounded-2xl mb-2 mr-2 border border-gray-200/80 shadow-2xs overflow-hidden flex flex-col">
-          {/* Action Toolbar */}
-          <div className="px-4 py-2 border-b border-gray-200/70 flex items-center justify-between text-gray-600 text-xs shrink-0 bg-white">
-            <div className="flex items-center gap-4">
-              <input type="checkbox" className="rounded border-gray-300 cursor-pointer accent-blue-600" />
-              <button className="hover:bg-gray-100 p-1.5 rounded-full transition-colors cursor-pointer">
-                <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
-              </button>
-              <button className="hover:bg-gray-100 p-1.5 rounded-full transition-colors cursor-pointer">
-                <RefreshCw className="w-3.5 h-3.5 text-gray-500" />
-              </button>
-              <button className="hover:bg-gray-100 p-1.5 rounded-full transition-colors cursor-pointer">
-                <MoreVertical className="w-3.5 h-3.5 text-gray-500" />
-              </button>
-            </div>
-
-            <div className="flex items-center gap-3 text-gray-500 text-xs">
-              <span>1-50 of 379</span>
-              <div className="flex items-center gap-1">
-                <button className="p-1 hover:bg-gray-100 rounded-full cursor-pointer">
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button className="p-1 hover:bg-gray-100 rounded-full cursor-pointer">
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Email Rows - Hidden Scrollbar */}
-          <div className="flex-1 overflow-y-auto no-scrollbar divide-y divide-gray-100">
-            {EMAIL_LIST.map((email) => (
-              <div
-                key={email.id}
-                className="px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50/90 hover:shadow-2xs cursor-pointer transition-all text-xs group"
-              >
-                <input type="checkbox" className="rounded border-gray-300 cursor-pointer opacity-50 group-hover:opacity-100 accent-blue-600" />
-                <Star className="w-4 h-4 text-gray-300 hover:text-amber-400 cursor-pointer shrink-0" />
-
-                {/* Sender Name */}
-                <div className={`w-44 font-medium truncate shrink-0 ${email.unread ? 'text-gray-900 font-bold' : 'text-gray-700'}`}>
-                  {email.sender}
+          {selectedEmailId !== null ? (
+            <EmailDetailView
+              onBack={() => setSelectedEmailId(null)}
+              onSendFollowUp={() => {
+                setActiveApp('Chat');
+                setSelectedEmailId(null);
+              }}
+            />
+          ) : (
+            <>
+              {/* Action Toolbar */}
+              <div className="px-4 py-2 border-b border-gray-200/70 flex items-center justify-between text-gray-600 text-xs shrink-0 bg-white">
+                <div className="flex items-center gap-4">
+                  <input type="checkbox" className="rounded border-gray-300 cursor-pointer accent-blue-600" />
+                  <button className="hover:bg-gray-100 p-1.5 rounded-full transition-colors cursor-pointer">
+                    <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
+                  </button>
+                  <button className="hover:bg-gray-100 p-1.5 rounded-full transition-colors cursor-pointer">
+                    <RefreshCw className="w-3.5 h-3.5 text-gray-500" />
+                  </button>
+                  <button className="hover:bg-gray-100 p-1.5 rounded-full transition-colors cursor-pointer">
+                    <MoreVertical className="w-3.5 h-3.5 text-gray-500" />
+                  </button>
                 </div>
 
-                {/* Status Badge with Dot */}
-                <div className="w-32 shrink-0 flex items-center">
-                  {email.badge === 'NEEDS REPLY' && (
-                    <span className="flex items-center gap-1.5 text-[11px] font-bold text-red-600 uppercase tracking-tight">
-                      <span className="w-2 h-2 rounded-full bg-red-600 shrink-0" />
-                      NEEDS REPLY
-                    </span>
-                  )}
-                  {email.badge === 'ACTION REQ' && (
-                    <span className="flex items-center gap-1.5 text-[11px] font-bold text-red-600 uppercase tracking-tight">
-                      <span className="w-2 h-2 rounded-full bg-red-600 shrink-0" />
-                      ACTION REQ
-                    </span>
-                  )}
-                  {email.badge === 'FYI' && (
-                    <span className="flex items-center gap-1.5 text-[11px] font-medium text-gray-500 uppercase tracking-tight">
-                      <span className="w-2 h-2 rounded-full bg-gray-400 shrink-0" />
-                      FYI
-                    </span>
-                  )}
-                </div>
-
-                {/* Subject */}
-                <div className={`flex-1 truncate ${email.unread ? 'text-gray-900 font-bold' : 'text-gray-700'}`}>
-                  {email.subject}
-                </div>
-
-                {/* Date / Time */}
-                <div className={`text-[11px] shrink-0 ${email.unread ? 'text-gray-900 font-bold' : 'text-gray-500'}`}>
-                  {email.time}
+                <div className="flex items-center gap-3 text-gray-500 text-xs">
+                  <span>1-50 of 379</span>
+                  <div className="flex items-center gap-1">
+                    <button className="p-1 hover:bg-gray-100 rounded-full cursor-pointer">
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button className="p-1 hover:bg-gray-100 rounded-full cursor-pointer">
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
+
+              {/* Email Rows - Hidden Scrollbar */}
+              <div className="flex-1 overflow-y-auto no-scrollbar divide-y divide-gray-100">
+                {EMAIL_LIST.map((email) => (
+                  <div
+                    key={email.id}
+                    onClick={() => setSelectedEmailId(email.id)}
+                    className="px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50/90 hover:shadow-2xs cursor-pointer transition-all text-xs group"
+                  >
+                    <input type="checkbox" onClick={(e) => e.stopPropagation()} className="rounded border-gray-300 cursor-pointer opacity-50 group-hover:opacity-100 accent-blue-600" />
+                    <Star className="w-4 h-4 text-gray-300 hover:text-amber-400 cursor-pointer shrink-0" onClick={(e) => e.stopPropagation()} />
+
+                    {/* Sender Name */}
+                    <div className={`w-44 font-medium truncate shrink-0 ${email.unread ? 'text-gray-900 font-bold' : 'text-gray-700'}`}>
+                      {email.sender}
+                    </div>
+
+                    {/* Status Badge with Dot */}
+                    <div className="w-32 shrink-0 flex items-center">
+                      {email.badge === 'NEEDS REPLY' && (
+                        <span className="flex items-center gap-1.5 text-[11px] font-bold text-red-600 uppercase tracking-tight">
+                          <span className="w-2 h-2 rounded-full bg-red-600 shrink-0" />
+                          NEEDS REPLY
+                        </span>
+                      )}
+                      {email.badge === 'ACTION REQ' && (
+                        <span className="flex items-center gap-1.5 text-[11px] font-bold text-red-600 uppercase tracking-tight">
+                          <span className="w-2 h-2 rounded-full bg-red-600 shrink-0" />
+                          ACTION REQ
+                        </span>
+                      )}
+                      {email.badge === 'FYI' && (
+                        <span className="flex items-center gap-1.5 text-[11px] font-medium text-gray-500 uppercase tracking-tight">
+                          <span className="w-2 h-2 rounded-full bg-gray-400 shrink-0" />
+                          FYI
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Subject */}
+                    <div className={`flex-1 truncate ${email.unread ? 'text-gray-900 font-bold' : 'text-gray-700'}`}>
+                      {email.subject}
+                    </div>
+
+                    {/* Date / Time */}
+                    <div className={`text-[11px] shrink-0 ${email.unread ? 'text-gray-900 font-bold' : 'text-gray-500'}`}>
+                      {email.time}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </main>
 
         {/* RIGHTSIDE APP BAR - Matching Figma Specs (40px x 205px, rounded-[20px]) */}
@@ -340,7 +356,7 @@ export const GmailBackground: React.FC = () => {
             <User className="w-4 h-4" />
           </button>
         </aside>
-            <ChatPopUpWidget />
+            {selectedEmailId === null && <ChatPopUpWidget />}
           </>
         )}
       </div>
