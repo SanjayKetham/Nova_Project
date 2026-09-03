@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Menu,
   Search,
@@ -26,6 +26,8 @@ import {
   User,
   Plus
 } from 'lucide-react';
+import { FullChatView } from './FullChatView';
+import { ChatPopUpWidget } from './ChatPopUpWidget';
 
 interface EmailThread {
   id: string;
@@ -57,18 +59,20 @@ const EMAIL_LIST: EmailThread[] = [
 ];
 
 const GmailLogo = () => (
-  <div className="flex items-center gap-2 select-none">
-    <svg className="w-7 h-5" viewBox="0 0 24 19" fill="none">
+  <div className="w-[112.28px] h-[32px] flex items-center gap-2 select-none shrink-0">
+    <svg className="w-8 h-6 shrink-0" viewBox="0 0 24 19" fill="none">
       <path d="M1.5 16.5V4.5C1.5 3.4 2.4 2.5 3.5 2.5H6.5V10.5L12 14.5L17.5 10.5V2.5H20.5C21.6 2.5 22.5 3.4 22.5 4.5V16.5C22.5 17.6 21.6 18.5 20.5 18.5H17.5V11.5L12 15.5L6.5 11.5V18.5H3.5C2.4 18.5 1.5 17.6 1.5 16.5Z" fill="#4285F4"/>
       <path d="M17.5 2.5L12 6.5L6.5 2.5H3.5C2.4 2.5 1.5 3.4 1.5 4.5V5.5L12 13.5L22.5 5.5V4.5C22.5 3.4 21.6 2.5 20.5 2.5H17.5Z" fill="#EA4335"/>
       <path d="M1.5 5.5V16.5C1.5 17.6 2.4 18.5 3.5 18.5H6.5V10.5L1.5 6.5V5.5Z" fill="#FBBC04"/>
       <path d="M17.5 10.5V18.5H20.5C21.6 18.5 22.5 17.6 22.5 16.5V5.5L17.5 9.5V10.5Z" fill="#34A853"/>
     </svg>
-    <span className="text-xl font-normal text-gray-600 font-sans tracking-tight">Gmail</span>
+    <span className="text-[22px] font-normal text-[#444746] font-sans tracking-tight leading-none">Gmail</span>
   </div>
 );
 
 export const GmailBackground: React.FC = () => {
+  const [activeApp, setActiveApp] = useState<'Mail' | 'Chat' | 'Meet'>('Chat');
+
   return (
     <div className="h-screen w-screen bg-[#F6F8FC] flex flex-col font-sans select-none overflow-hidden text-[#1F1F1F]">
       {/* TOP HEADER BAR */}
@@ -81,23 +85,21 @@ export const GmailBackground: React.FC = () => {
           <GmailLogo />
         </div>
 
-        {/* Center Search Bar */}
-        <div className="flex-1 max-w-2xl">
-          <div className="flex items-center gap-3 px-4 py-2 bg-[#EAF1FB] focus-within:bg-white focus-within:shadow-md focus-within:ring-1 focus-within:ring-gray-300 rounded-full transition-all">
-            <Search className="w-5 h-5 text-gray-600 shrink-0" />
-            <input
-              type="text"
-              placeholder="Search mail"
-              className="w-full bg-transparent border-none outline-none text-sm text-gray-800 placeholder-gray-500 font-normal"
-            />
-            <button className="p-1 hover:bg-gray-200/50 rounded-full text-gray-600 shrink-0 cursor-pointer">
-              <SlidersHorizontal className="w-4 h-4" />
-            </button>
-          </div>
+        {/* Center Search Bar - Matching Figma Specs (763px x 48px, rounded 24px, bg #EAF1FB) */}
+        <div className="w-[763px] h-[48px] px-4 bg-[#EAF1FB] focus-within:bg-white focus-within:shadow-md focus-within:ring-1 focus-within:ring-gray-300 rounded-[24px] flex items-center gap-3 transition-all shrink-0">
+          <Search className="w-5 h-5 text-gray-600 shrink-0" />
+          <input
+            type="text"
+            placeholder="Search mail"
+            className="w-full bg-transparent border-none outline-none text-sm text-gray-800 placeholder-gray-500 font-normal"
+          />
+          <button className="p-1 hover:bg-gray-200/50 rounded-full text-gray-600 shrink-0 cursor-pointer" title="Search options">
+            <SlidersHorizontal className="w-4 h-4" />
+          </button>
         </div>
 
-        {/* Right side controls */}
-        <div className="flex items-center gap-2.5 text-gray-600 shrink-0">
+        {/* Right side controls - Matching Figma Specs (280.2px width, 40px height, 4px right padding) */}
+        <div className="w-[280.2px] h-[40px] pr-[4px] flex items-center justify-end gap-2.5 text-gray-600 shrink-0">
           {/* Active status pill with green dot & schedule icon */}
           <div className="flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-300/90 rounded-full cursor-pointer hover:bg-gray-50 transition-all text-xs text-gray-700 shadow-2xs">
             <span className="w-2.5 h-2.5 rounded-full bg-[#34A853] shrink-0" />
@@ -136,40 +138,59 @@ export const GmailBackground: React.FC = () => {
 
       {/* MAIN BODY AREA */}
       <div className="flex-1 flex overflow-hidden">
-        {/* FAR LEFT APP SWITCHER SIDEBAR */}
-        <aside className="w-16 bg-[#F6F8FC] py-3 flex flex-col items-center gap-4 shrink-0 text-gray-600 text-[11px] font-medium border-r border-transparent">
-          {/* Mail app (active) */}
-          <button className="flex flex-col items-center gap-1 group cursor-pointer w-full">
-            <div className="w-12 h-8 rounded-full bg-[#C2E7FF] text-[#001D35] flex items-center justify-center transition-all group-hover:bg-[#b2dcff]">
+        {/* FAR LEFT APP SWITCHER SIDEBAR - Matching Figma Specs (75px width, 0.8px border #E8EAED, 6px top padding, 2px gap) */}
+        <aside className="w-[75px] bg-[#F6F8FC] pt-[6px] pb-3 flex flex-col items-center gap-[2px] shrink-0 text-gray-600 text-[11px] font-medium border-r border-[#E8EAED]">
+          {/* Mail app */}
+          <button
+            onClick={() => setActiveApp('Mail')}
+            className="flex flex-col items-center gap-0.5 group cursor-pointer w-full py-1"
+          >
+            <div className={`w-[52px] h-[32px] rounded-full flex items-center justify-center transition-all ${
+              activeApp === 'Mail' ? 'bg-[#C2E7FF] text-[#001D35]' : 'hover:bg-gray-200/60 text-gray-600'
+            }`}>
               <Mail className="w-5 h-5" />
             </div>
-            <span className="text-[#001D35] font-semibold">Mail</span>
+            <span className={activeApp === 'Mail' ? 'text-[#001D35] font-semibold' : 'text-gray-600'}>Mail</span>
           </button>
 
           {/* Chat app */}
-          <button className="flex flex-col items-center gap-1 group cursor-pointer w-full hover:text-gray-900">
-            <div className="w-12 h-8 rounded-full flex items-center justify-center transition-all group-hover:bg-gray-200/60">
-              <MessageSquare className="w-5 h-5 text-gray-600" />
+          <button
+            onClick={() => setActiveApp('Chat')}
+            className="flex flex-col items-center gap-0.5 group cursor-pointer w-full py-1"
+          >
+            <div className={`w-[52px] h-[32px] rounded-full flex items-center justify-center transition-all ${
+              activeApp === 'Chat' ? 'bg-[#C2E7FF] text-[#001D35]' : 'hover:bg-gray-200/60 text-gray-600'
+            }`}>
+              <MessageSquare className="w-5 h-5" />
             </div>
-            <span>Chat</span>
+            <span className={activeApp === 'Chat' ? 'text-[#001D35] font-semibold' : 'text-gray-600'}>Chat</span>
           </button>
 
           {/* Meet app */}
-          <button className="flex flex-col items-center gap-1 group cursor-pointer w-full hover:text-gray-900">
-            <div className="w-12 h-8 rounded-full flex items-center justify-center transition-all group-hover:bg-gray-200/60">
-              <Video className="w-5 h-5 text-gray-600" />
+          <button
+            onClick={() => setActiveApp('Meet')}
+            className="flex flex-col items-center gap-0.5 group cursor-pointer w-full py-1"
+          >
+            <div className={`w-[52px] h-[32px] rounded-full flex items-center justify-center transition-all ${
+              activeApp === 'Meet' ? 'bg-[#C2E7FF] text-[#001D35]' : 'hover:bg-gray-200/60 text-gray-600'
+            }`}>
+              <Video className="w-5 h-5" />
             </div>
-            <span>Meet</span>
+            <span className={activeApp === 'Meet' ? 'text-[#001D35] font-semibold' : 'text-gray-600'}>Meet</span>
           </button>
         </aside>
 
-        {/* LEFT NAVIGATION DRAWER */}
-        <aside className="w-56 bg-[#F6F8FC] p-2 pr-3 flex flex-col gap-3 shrink-0">
-          {/* Compose button */}
-          <button className="flex items-center gap-3 px-5 py-3.5 bg-[#C2E7FF] hover:bg-[#b0dcff] hover:shadow-md text-[#001D35] rounded-2xl font-medium text-sm transition-all shadow-xs cursor-pointer w-fit my-1">
-            <Pencil className="w-5 h-5 text-[#001D35]" />
-            <span>Compose</span>
-          </button>
+        {activeApp === 'Chat' ? (
+          <FullChatView />
+        ) : (
+          <>
+            {/* LEFT NAVIGATION DRAWER */}
+            <aside className="w-56 bg-[#F6F8FC] p-2 pr-3 flex flex-col gap-3 shrink-0">
+              {/* Compose button */}
+              <button className="flex items-center gap-3 px-5 py-3.5 bg-[#C2E7FF] hover:bg-[#b0dcff] hover:shadow-md text-[#001D35] rounded-2xl font-medium text-sm transition-all shadow-xs cursor-pointer w-fit my-1">
+                <Pencil className="w-5 h-5 text-[#001D35]" />
+                <span>Compose</span>
+              </button>
 
           {/* Nav links */}
           <nav className="space-y-0.5 text-xs text-gray-700 font-medium">
@@ -253,8 +274,8 @@ export const GmailBackground: React.FC = () => {
             </div>
           </div>
 
-          {/* Email Rows */}
-          <div className="flex-1 overflow-y-auto divide-y divide-gray-100">
+          {/* Email Rows - Hidden Scrollbar */}
+          <div className="flex-1 overflow-y-auto no-scrollbar divide-y divide-gray-100">
             {EMAIL_LIST.map((email) => (
               <div
                 key={email.id}
@@ -304,25 +325,24 @@ export const GmailBackground: React.FC = () => {
           </div>
         </main>
 
-        {/* RIGHTSIDE APP BAR */}
-        <aside className="w-14 bg-[#F6F8FC] py-3 flex flex-col items-center gap-5 shrink-0 text-gray-600 border-l border-transparent">
-          <button className="p-2 hover:bg-gray-200/60 rounded-full transition-colors cursor-pointer text-red-500" title="Calendar">
-            <Calendar className="w-5 h-5" />
+        {/* RIGHTSIDE APP BAR - Matching Figma Specs (40px x 205px, rounded-[20px]) */}
+        <aside className="w-[40px] h-[205px] bg-[#F6F8FC] py-3 my-2 mr-2 flex flex-col items-center justify-between shrink-0 text-gray-600 rounded-[20px]">
+          <button className="p-1.5 hover:bg-gray-200/60 rounded-full transition-colors cursor-pointer text-red-500" title="Calendar">
+            <Calendar className="w-4 h-4" />
           </button>
-          <button className="p-2 hover:bg-gray-200/60 rounded-full transition-colors cursor-pointer text-amber-500" title="Keep">
-            <Lightbulb className="w-5 h-5" />
+          <button className="p-1.5 hover:bg-gray-200/60 rounded-full transition-colors cursor-pointer text-amber-500" title="Keep">
+            <Lightbulb className="w-4 h-4" />
           </button>
-          <button className="p-2 hover:bg-gray-200/60 rounded-full transition-colors cursor-pointer text-blue-600" title="Tasks">
-            <CheckSquare className="w-5 h-5" />
+          <button className="p-1.5 hover:bg-gray-200/60 rounded-full transition-colors cursor-pointer text-blue-600" title="Tasks">
+            <CheckSquare className="w-4 h-4" />
           </button>
-          <button className="p-2 hover:bg-gray-200/60 rounded-full transition-colors cursor-pointer text-blue-500" title="Contacts">
-            <User className="w-5 h-5" />
-          </button>
-          <div className="w-6 border-b border-gray-300/80 my-1" />
-          <button className="p-2 hover:bg-gray-200/60 rounded-full transition-colors cursor-pointer text-gray-500" title="Get Add-ons">
-            <Plus className="w-5 h-5" />
+          <button className="p-1.5 hover:bg-gray-200/60 rounded-full transition-colors cursor-pointer text-blue-500" title="Contacts">
+            <User className="w-4 h-4" />
           </button>
         </aside>
+            <ChatPopUpWidget />
+          </>
+        )}
       </div>
     </div>
   );
