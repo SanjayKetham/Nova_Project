@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "AIRA - Contextual Intelligence for Gmail & Google Chat",
+  "version": "1.0.0",
+  "description": "Surfaces contextual nudges inside Gmail and Google Chat threads when work slows down, loses ownership, or drifts.",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "*://mail.google.com/*",
+    "*://chat.google.com/*",
+    "*://*.google.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AIRA Assistant"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://mail.google.com/*",
+        "*://chat.google.com/*",
+        "*://*.google.com/*"
+      ],
+      "js": [
+        "airaIntelligence.js",
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_end"
+    }
+  ]
+}

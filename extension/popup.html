@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AIRA Gmail Extension</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      width: 325px;
+      margin: 0;
+      padding: 16px;
+      background-color: #FFFFFF;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #0F172A;
+      -webkit-font-smoothing: antialiased;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .logo-badge {
+      background: linear-gradient(135deg, #5B3DF5 0%, #7C3AED 100%);
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(91, 61, 245, 0.25);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .sparkle-svg {
+      width: 12px;
+      height: 12px;
+      fill: currentColor;
+    }
+    .title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #0F172A;
+      letter-spacing: -0.2px;
+    }
+    .status-card {
+      background-color: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      transition: all 0.2s ease;
+    }
+    .status-card:hover {
+      border-color: rgba(91, 61, 245, 0.3);
+      box-shadow: 0 4px 12px rgba(91, 61, 245, 0.05);
+    }
+    .status-header {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #0F172A;
+      display: flex;
+      align-items: center;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #10B981;
+      display: inline-block;
+      margin-right: 8px;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .status-desc {
+      font-size: 11px;
+      color: #64748B;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+    .label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+      padding-left: 2px;
+    }
+    .scenarios-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .scenario-btn {
+      width: 100%;
+      text-align: left;
+      padding: 9.5px 13px;
+      border-radius: 14px;
+      border: 1px solid #E2E8F0;
+      background-color: #FFFFFF;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .scenario-btn:hover {
+      border-color: #5B3DF5;
+      background-color: #F8FAFC;
+      color: #5B3DF5;
+    }
+    .scenario-btn.active {
+      background: linear-gradient(135deg, #5B3DF5 0%, #4C2EE3 100%);
+      color: #FFFFFF;
+      border-color: #5B3DF5;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(91, 61, 245, 0.25);
+    }
+    .scenario-btn .indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #CBD5E1;
+      transition: all 0.2s ease;
+    }
+    .scenario-btn.active .indicator {
+      background-color: #FFFFFF;
+      box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+    }
+    .auto-btn {
+      border-color: #C084FC;
+      color: #7E22CE;
+      background-color: #FAF5FF;
+    }
+    .auto-btn:hover {
+      background-color: #F3E8FF;
+    }
+    .footer {
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid #F1F5F9;
+      font-size: 11px;
+      color: #94A3B8;
+      text-align: center;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .reset-link {
+      color: #5B3DF5;
+      text-decoration: underline;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <span class="logo-badge">
+      <svg class="sparkle-svg" viewBox="0 0 24 24">
+        <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/>
+      </svg>
+      AIRA
+    </span>
+    <span class="title">Gmail Intelligence Prototype</span>
+  </div>
+
+  <div class="status-card">
+    <div class="status-header">
+      <span class="status-dot"></span>
+      <span>Extension Active on Gmail</span>
+    </div>
+    <div class="status-desc">
+      Invisible intelligence layer observing email threads in real time.
+    </div>
+  </div>
+
+  <div class="label">Test Mode Selection</div>
+
+  <div class="scenarios-list">
+    <button class="scenario-btn auto-btn" data-scenario="auto_detect">
+      <span>⚡ Auto-Detect Live Thread</span>
+      <span class="indicator"></span>
+    </button>
+    <button class="scenario-btn active" data-scenario="delayed_response">
+      <span>1. Delayed Response (~6h)</span>
+      <span class="indicator"></span>
+    </button>
+    <button class="scenario-btn" data-scenario="missing_ownership">
+      <span>2. Missing Ownership</span>
+      <span class="indicator"></span>
+    </button>
+    <button class="scenario-btn" data-scenario="conversation_loop">
+      <span>3. Conversation Loop</span>
+      <span class="indicator"></span>
+    </button>
+    <button class="scenario-btn" data-scenario="normal_progress">
+      <span>4. Normal Progress (Silent AIRA)</span>
+      <span class="indicator"></span>
+    </button>
+  </div>
+
+  <div class="footer">
+    <span>Nova AIRA Extension v1.0</span>
+    <button class="reset-link" id="reset-aira-btn">Reset AIRA Nudges</button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

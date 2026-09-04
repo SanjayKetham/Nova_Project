@@ -1,32 +1,82 @@
-# React + TypeScript + Vite
+# Nova AIRA - Invisible Gmail Intelligence Layer Prototype
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+This project prototypes **Nova AIRA** as a Chrome Browser Extension and interactive Gmail application prototype.
 
-Currently, two official plugins are available:
+AIRA is designed as an **invisible intelligence layer over Gmail** that observes email threads in real time and surfaces subtle, contextual nudges only when communication requires follow-up, clarity of ownership, or convergence.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🌟 Core Product Features & Scenarios
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 1. Scenario 1 — Delayed Response (~6h)
+- **Trigger**: An email question has not received a response for several hours.
+- **AIRA Nudge**: *"This might need a follow-up"*
+- **Supporting Context**: *"No response for ~6h · longer than usual"*
+- **Action**: Clicking **Follow up** opens Gmail's reply interface with a suggested response:
+  > *"Hi Sarah, just following up on this. Could you confirm whether we should proceed with the API changes?"*
 
-## Expanding the Oxlint configuration
+### 2. Scenario 2 — Missing Ownership
+- **Trigger**: Thread ends with an action item (e.g. *"let's get this done this week"*) but no clear owner assigned.
+- **AIRA Nudge**: *"This may need an owner"*
+- **Supporting Context**: *"No clear owner for the next step"*
+- **Action**: Clicking **Clarify ownership** surfaces an inline candidate selector (*Navatej | Sarah | Rahul*). Selecting someone generates a suggested reply draft:
+  > *"Sarah, could you take this forward and coordinate the next steps?"*
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+### 3. Scenario 3 — Conversation Loop
+- **Trigger**: Multiple back-and-forth replies without reaching a conclusion.
+- **AIRA Nudge**: *"This conversation isn't converging"*
+- **Supporting Context**: *"Multiple replies without a clear decision"*
+- **Action**: Clicking **Summarize next step** generates a structured summary draft.
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+### 4. Scenario 4 — Normal Progress (Silence Principle)
+- **Trigger**: Conversation is progressing normally.
+- **AIRA Behavior**: **100% Invisible!** AIRA does not interrupt normal email workflows.
+
+---
+
+## 💡 Lightweight "Why?" Interaction
+Every nudge includes a **"Why am I seeing this?"** accordion that provides clear, human-understandable context (e.g., *"Question asked 6 hours ago with no response yet"*, *"Similar API design conversations usually resolve within 2 hours"*), building trust without exposing raw technical AI logs.
+
+---
+
+## 🛠️ Architecture & Intelligence Layer
+
+```
+Gmail Web Interface (mail.google.com / Web Simulator)
+           ↓
+    Thread Parser (extracts subject, body, timestamp, candidates)
+           ↓
+   AIRA Intelligence Engine (evaluates rules & signals)
+           ↓
+    Signal Output ({ scenarioId, intervention, title, context, action, draft })
+           ↓
+ AIRA UI Component (Contextual inline nudge injection)
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+- **Separation of Concerns**: Pure intelligence logic is decoupled from React / DOM rendering (`src/services/airaIntelligence.ts`).
+- **User Control**: AIRA **never** sends emails automatically. It populates Gmail's reply editor, allowing the user to review, edit, or discard before sending.
+
+---
+
+## 📦 How to Load Chrome Extension in Google Chrome
+
+1. Open Chrome and go to `chrome://extensions`.
+2. Enable **Developer mode** (top-right toggle).
+3. Click **Load unpacked**.
+4. Select the `extension/` folder inside this directory:
+   `c:\Users\sanja\nova-app\extension`
+5. Open [Gmail](https://mail.google.com), click an email thread, and test AIRA nudges directly inside real Gmail!
+
+---
+
+## 💻 How to Run the Web App Simulator Locally
+
+```bash
+# Install dependencies (if not already installed)
+npm install
+
+# Run dev server
+npm run dev
+```
+
+Open `http://localhost:5173` to test the interactive Gmail prototype simulator.
